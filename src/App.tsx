@@ -1,66 +1,72 @@
 import "./styles.css";
-import { Button, Input, Form } from "antd";
+import { Button, Input, Form, InputNumber } from "antd";
 import { useEffect, useState } from "react";
 
 export default function App() {
-  const [totalmount, setTotalMount] = useState(115);
-  const [monthCount, setMonthCount] = useState(360);
-  const [yearRate, setYearRate] = useState(0.0565);
-  const [monthRate, setMonthRate] = useState(0.53 / 12);
+  const [formRef] = Form.useForm();
 
-  useEffect(() => {
-    setMonthRate(yearRate / 12);
-  }, [yearRate]);
+  const initialValues = {
+    yearRate: 5.65,
+    totalMount: 115,
+    monthCount: 360,
+  };
 
-  const [everyMonthReback, setEveryMonthReback] = useState(0);
-  const calculate = () => {
+  const [MonthlyPayments, setMonthlyPayments] = useState("");
+
+  const yearRate = Form.useWatch("yearRate", formRef);
+  const monthRate = yearRate / 12;
+
+  const calculate = (values) => {
+    console.log("values:", values);
+    const { totalMount, monthCount } = values;
     // 每月还款金额 = [贷款本金×月利率×(1+月利率)^贷款月数] / [(1+月利率)^贷款月数－1]
     const value =
-      (totalmount * 10000 * (monthRate * Math.pow(1 + monthRate, monthCount))) /
-      (Math.pow(1 + monthRate, monthCount) - 1);
+      (totalMount *
+        10000 *
+        ((monthRate / 100) * Math.pow(1 + monthRate / 100, monthCount))) /
+      (Math.pow(1 + monthRate / 100, monthCount) - 1);
 
-    setEveryMonthReback(value);
+    setMonthlyPayments(value.toFixed(2));
 
     // 待还总额度
   };
   return (
-    <div className="w-[300px] p-4">
-      <Form 
-        labelCol={{span:8}}
-        wrapperCol={{span:16}}
+    <div className="w-[300px] p-4 border-gray-300 rounded-lg shadow-sm border border-solid">
+      <Form
+        size="large"
+        form={formRef}
+        labelCol={{ span: 6 }}
+        wrapperCol={{ span: 18 }}
+        initialValues={initialValues}
+        layout="horizontal"
+        onFinish={calculate}
       >
-        <Form.Item label="贷款总额">
-          <Input
-            type="number"
-            value={totalmount}
-            onChange={(e) => {
-              setTotalMount(Number(e.target.value));
-            }}
+        <Form.Item label="贷款总额" name="totalMount">
+          <InputNumber
+            formatter={(value) => `${value} 万`}
+            className="w-full"
           />
         </Form.Item>
 
-        <Form.Item label="贷款期限（月数）">
-          <Input
-            type="number"
-            value={monthCount}
-            onChange={(e) => {
-              setMonthCount(Number(e.target.value));
-            }}
+        <Form.Item label="贷款期限" name="monthCount">
+          <InputNumber
+            className="w-full"
+            formatter={(value) => `${value} 个月`}
           />
         </Form.Item>
 
-        <Form.Item label="年利率">
-          <Input
-            type="number"
-            onChange={(e) => {
-              setYearRate(parseFloat(e.target.value));
-            }}
-          />
-          <span>月利率：{monthRate}</span>
+        <Form.Item label="年利率" name="yearRate">
+          <InputNumber className="w-full" formatter={(value) => `${value}%`} />
         </Form.Item>
 
-        <Form.Item label="">
-          <Button onClick={calculate}>计算</Button>
+        <Form.Item label="月利率：">
+          <span>{monthRate&&monthRate.toFixed(2)||0}%</span>
+        </Form.Item>
+
+        <Form.Item label="" wrapperCol={{ span: 20, offset: 14 }}>
+          <Button type="primary" htmlType="submit">
+            计算
+          </Button>
         </Form.Item>
       </Form>
 
@@ -68,12 +74,12 @@ export default function App() {
         每月还款：
         <div>
           {/* // 每月还款额=贷款本金×[月利率×(1+月利率)^还款月数]÷[(1+月利率)^还款月数-1] */}
-          {everyMonthReback}
+          {MonthlyPayments}
         </div>
-        <ul>
-          {}
+        {/* <ul>
+          { }
           <li></li>
-        </ul>
+        </ul> */}
       </div>
     </div>
   );
