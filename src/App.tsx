@@ -1,6 +1,6 @@
 import "./styles.css";
-import { Button, Input, Form, InputNumber } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Form, InputNumber } from "antd";
+import {  useState } from "react";
 
 export default function App() {
   const [formRef] = Form.useForm();
@@ -60,7 +60,7 @@ export default function App() {
         </Form.Item>
 
         <Form.Item label="月利率：">
-          <span>{monthRate&&monthRate.toFixed(2)||0}%</span>
+          <span>{monthRate&&monthRate.toFixed(2)||0}% = {yearRate}% / 12</span>
         </Form.Item>
 
         <Form.Item label="" wrapperCol={{ span: 20, offset: 14 }}>
