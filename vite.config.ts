@@ -5,9 +5,9 @@ import tailwindcss from "tailwindcss";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: 'calc',  // 配置静态资源的存放位置
   build: {
     outDir: 'docs',
-    assetsDir: 'calc',
   },
   css: {
     preprocessorOptions: {
