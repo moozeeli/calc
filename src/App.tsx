@@ -1,15 +1,19 @@
 import "./styles.css";
 import { Button, Form, InputNumber } from "antd";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 
 export default function App() {
   const [formRef] = Form.useForm();
 
-  const initialValues = {
-    yearRate: 5.65,
-    totalMount: 115,
-    monthCount: 360,
+
+
+  const initialValues =  localStorage.getItem('values')?JSON.parse(localStorage.getItem('values')):{
+    yearRate: 3.3,
+    totalMount: 32.832193,
+    monthCount: 172,
   };
+
+
 
   const [MonthlyPayments, setMonthlyPayments] = useState("");
 
@@ -17,8 +21,11 @@ export default function App() {
   const monthRate = yearRate / 12;
 
   const calculate = (values) => {
-    console.log("values:", values);
-    const { totalMount, monthCount } = values;
+
+    localStorage.setItem('values',JSON.stringify(values))
+    const { totalMount, monthCount, yearRate } = values;
+    const monthRate = yearRate / 12;
+    
     // 每月还款金额 = [贷款本金×月利率×(1+月利率)^贷款月数] / [(1+月利率)^贷款月数－1]
     const value =
       (totalMount *
@@ -30,6 +37,18 @@ export default function App() {
 
     // 待还总额度
   };
+
+  useEffect(() => {
+    calculate(initialValues);
+  }, []);
+
+  const onValuesChange = (changedValues, allValues) => {
+    console.log('litong: changedValues:',changedValues);
+    console.log('litong: allValues:',allValues);
+    calculate(allValues);
+  }
+  
+
   return (
     <div className="w-[300px] p-4 border-gray-300 rounded-lg shadow-sm border border-solid">
       <Form
@@ -38,6 +57,7 @@ export default function App() {
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         initialValues={initialValues}
+        onValuesChange={onValuesChange}
         layout="horizontal"
         onFinish={calculate}
       >
@@ -73,13 +93,9 @@ export default function App() {
       <div>
         每月还款：
         <div>
-          {/* // 每月还款额=贷款本金×[月利率×(1+月利率)^还款月数]÷[(1+月利率)^还款月数-1] */}
+          {/* <div>(每月还款额=贷款本金×[月利率×(1+月利率)^还款月数]÷[(1+月利率)^还款月数-1])</div> */}
           {MonthlyPayments}
         </div>
-        {/* <ul>
-          { }
-          <li></li>
-        </ul> */}
       </div>
     </div>
   );
