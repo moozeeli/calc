@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/',  // 配置静态资源的存放位置
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
   },
   css: {
     preprocessorOptions: {
